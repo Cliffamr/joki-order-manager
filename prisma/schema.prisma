@@ -1,0 +1,146 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  PENJOKI
+}
+
+enum PaymentStatus {
+  UNPAID
+  DP
+  PAID
+}
+
+enum WorkStatus {
+  NEW
+  IN_PROGRESS
+  REVISION
+  DONE
+  DELIVERED
+  CANCELED
+}
+
+enum FeeType {
+  FLAT
+  PERCENT
+}
+
+enum PayoutStatus {
+  UNPAID
+  PAID
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(PENJOKI)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders     Order[]    @relation("JockeyOrders")
+  auditLogs  AuditLog[]
+  payouts    Payout[]
+
+  @@map("users")
+}
+
+model Order {
+  id              String        @id @default(cuid())
+  orderCode       String        @unique
+  customerNumber  String
+  jobType         String
+  price           Float
+  paidAmount      Float         @default(0)
+  paymentStatus   PaymentStatus @default(UNPAID)
+  workStatus      WorkStatus    @default(NEW)
+  dueDate         DateTime?
+  notes           String?
+  
+  // Fee calculation
+  feeAdmin        Float         @default(0)
+  netJockey       Float         @default(0)
+  
+  // Google Sheets sync
+  sheetRowId      String?
+  
+  // Timestamps
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  jockeyId        String
+  jockey          User          @relation("JockeyOrders", fields: [jockeyId], references: [id])
+  auditLogs       AuditLog[]
+
+  @@index([jockeyId])
+  @@index([orderCode])
+  @@index([paymentStatus])
+  @@index([workStatus])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model FeeRule {
+  id        String   @id @default(cuid())
+  minPrice  Float
+  maxPrice  Float
+  feeType   FeeType  @default(FLAT)
+  feeValue  Float    // For FLAT: nominal amount, For PERCENT: percentage (e.g., 10 for 10%)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("fee_rules")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String   // CREATE, UPDATE, DELETE
+  field     String?  // Which field was changed
+  oldValue  String?
+  newValue  String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([orderId])
+  @@index([userId])
+  @@map("audit_logs")
+}
+
+model Payout {
+  id          String       @id @default(cuid())
+  periodStart DateTime
+  periodEnd   DateTime
+  totalGross  Float
+  totalFee    Float
+  totalNet    Float
+  status      PayoutStatus @default(UNPAID)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  jockeyId    String
+  jockey      User         @relation(fields: [jockeyId], references: [id])
+
+  @@index([jockeyId])
+  @@index([periodStart, periodEnd])
+  @@map("payouts")
+}
