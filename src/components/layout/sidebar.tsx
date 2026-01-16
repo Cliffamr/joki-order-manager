@@ -22,8 +22,9 @@ import { Separator } from "@/components/ui/separator"
 const adminNavItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/orders", label: "Orders", icon: ClipboardList },
+    { href: "/penjoki", label: "Penjoki", icon: Users },
     { href: "/fee-rules", label: "Fee Rules", icon: Receipt },
-    { href: "/payroll", label: "Payroll", icon: Users },
+    { href: "/payroll", label: "Payroll", icon: FileText },
 ]
 
 const penjokiNavItems = [

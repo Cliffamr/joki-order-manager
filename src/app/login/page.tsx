@@ -124,19 +124,6 @@ export default function LoginPage() {
                                 )}
                             </Button>
                         </form>
-
-                        {/* Demo credentials */}
-                        <div className="mt-6 p-4 rounded-lg bg-muted/50">
-                            <p className="text-xs font-medium text-muted-foreground mb-2">Demo Credentials:</p>
-                            <div className="space-y-1 text-xs">
-                                <p>
-                                    <span className="font-medium">Admin:</span> admin@joki.com / admin123
-                                </p>
-                                <p>
-                                    <span className="font-medium">Penjoki:</span> penjoki1@joki.com / penjoki123
-                                </p>
-                            </div>
-                        </div>
                     </CardContent>
                 </Card>
             </div>

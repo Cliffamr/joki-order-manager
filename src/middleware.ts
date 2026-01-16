@@ -7,7 +7,7 @@ export default withAuth(
         const pathname = req.nextUrl.pathname
 
         // Admin-only routes
-        const adminRoutes = ['/dashboard', '/orders', '/fee-rules', '/payroll']
+        const adminRoutes = ['/dashboard', '/orders', '/fee-rules', '/payroll', '/penjoki']
         const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
 
         // Penjoki-only routes
@@ -37,6 +37,7 @@ export const config = {
         '/orders/:path*',
         '/fee-rules/:path*',
         '/payroll/:path*',
+        '/penjoki/:path*',
         '/my-orders/:path*',
     ],
 }
