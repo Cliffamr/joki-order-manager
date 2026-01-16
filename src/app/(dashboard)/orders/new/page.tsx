@@ -1,6 +1,8 @@
 import { getPenjokiList } from "@/actions/orders"
 import { NewOrderForm } from "./new-order-form"
 
+export const dynamic = 'force-dynamic'
+
 export default async function NewOrderPage() {
     const penjokis = await getPenjokiList()
 
