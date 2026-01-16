@@ -39,5 +39,6 @@ export const config = {
         '/payroll/:path*',
         '/penjoki/:path*',
         '/my-orders/:path*',
+        '/profile/:path*',
     ],
 }

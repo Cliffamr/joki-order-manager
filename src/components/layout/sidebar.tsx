@@ -12,6 +12,7 @@ import {
     Menu,
     X,
     FileText,
+    User,
 } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
@@ -25,10 +26,12 @@ const adminNavItems = [
     { href: "/penjoki", label: "Penjoki", icon: Users },
     { href: "/fee-rules", label: "Fee Rules", icon: Receipt },
     { href: "/payroll", label: "Payroll", icon: FileText },
+    { href: "/profile", label: "Profile", icon: User },
 ]
 
 const penjokiNavItems = [
     { href: "/my-orders", label: "My Orders", icon: FileText },
+    { href: "/profile", label: "Profile", icon: User },
 ]
 
 export function Sidebar() {
