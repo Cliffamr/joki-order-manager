@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from "react-dom"
 import { updateProfile, ProfileState } from "@/actions/profile"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
@@ -72,10 +73,9 @@ export function ProfileForm({ user }: { user: { name: string; email: string } })
 
                     <div className="space-y-2">
                         <Label htmlFor="password">Password Baru (Opsional)</Label>
-                        <Input
+                        <PasswordInput
                             id="password"
                             name="password"
-                            type="password"
                             placeholder="Biarkan kosong jika tidak ingin mengubah"
                         />
                         <p className="text-sm text-muted-foreground">
@@ -85,10 +85,9 @@ export function ProfileForm({ user }: { user: { name: string; email: string } })
 
                     <div className="space-y-2">
                         <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
-                        <Input
+                        <PasswordInput
                             id="confirmPassword"
                             name="confirmPassword"
-                            type="password"
                             placeholder="Masukkan ulang password baru"
                         />
                     </div>

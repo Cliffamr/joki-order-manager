@@ -7,6 +7,7 @@ import { ArrowLeft, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { updatePenjoki } from "@/actions/users"
 
@@ -84,10 +85,9 @@ export function EditPenjokiForm({ penjoki }: { penjoki: Penjoki }) {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="password">Password Baru</Label>
-                        <Input
+                        <PasswordInput
                             id="password"
                             name="password"
-                            type="password"
                             placeholder="Masukkan password baru"
                             minLength={6}
                         />
@@ -95,10 +95,9 @@ export function EditPenjokiForm({ penjoki }: { penjoki: Penjoki }) {
 
                     <div className="space-y-2">
                         <Label htmlFor="confirmPassword">Konfirmasi Password Baru</Label>
-                        <Input
+                        <PasswordInput
                             id="confirmPassword"
                             name="confirmPassword"
-                            type="password"
                             placeholder="Masukkan ulang password baru"
                             minLength={6}
                         />
