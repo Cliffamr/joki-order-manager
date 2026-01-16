@@ -1,8 +1,13 @@
-import { getPayrollSummary } from "@/actions/payroll"
+import { getPayrollSummary, getPayouts } from "@/actions/payroll"
 import { PayrollClient } from "./payroll-client"
 
-export default async function PayrollPage() {
-    const summary = await getPayrollSummary({})
+export const dynamic = 'force-dynamic'
 
-    return <PayrollClient initialSummary={summary} />
+export default async function PayrollPage() {
+    const [summary, payouts] = await Promise.all([
+        getPayrollSummary({}),
+        getPayouts(),
+    ])
+
+    return <PayrollClient initialSummary={summary} initialPayouts={payouts} />
 }

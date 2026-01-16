@@ -283,3 +283,138 @@ export async function getOmzetPerJockey(params: {
         orders: penjoki.orders.length,
     }))
 }
+
+// ============= PAYOUT MANAGEMENT =============
+
+export async function createPayout(data: {
+    jockeyId: string
+    periodStart: string
+    periodEnd: string
+}) {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" }
+    }
+
+    try {
+        const startDate = new Date(data.periodStart)
+        const endDate = new Date(data.periodEnd)
+
+        // Get orders for this jockey in the period
+        const orders = await prisma.order.findMany({
+            where: {
+                jockeyId: data.jockeyId,
+                workStatus: { in: ["DONE", "DELIVERED"] },
+                createdAt: {
+                    gte: startDate,
+                    lte: endDate,
+                },
+            },
+        })
+
+        if (orders.length === 0) {
+            return { success: false, error: "Tidak ada order selesai dalam periode ini" }
+        }
+
+        const totalGross = orders.reduce((sum, order) => sum + order.price, 0)
+        const totalFee = orders.reduce((sum, order) => sum + order.feeAdmin, 0)
+        const totalNet = orders.reduce((sum, order) => sum + order.netJockey, 0)
+
+        // Check if payout already exists for this period
+        const existing = await prisma.payout.findFirst({
+            where: {
+                jockeyId: data.jockeyId,
+                periodStart: startDate,
+                periodEnd: endDate,
+            },
+        })
+
+        if (existing) {
+            return { success: false, error: "Payout untuk periode ini sudah ada" }
+        }
+
+        const payout = await prisma.payout.create({
+            data: {
+                jockeyId: data.jockeyId,
+                periodStart: startDate,
+                periodEnd: endDate,
+                totalGross,
+                totalFee,
+                totalNet,
+                status: "UNPAID",
+            },
+        })
+
+        return { success: true, payout }
+    } catch (error) {
+        console.error("Create payout error:", error)
+        return { success: false, error: "Gagal membuat payout" }
+    }
+}
+
+export async function getPayouts(params?: {
+    jockeyId?: string
+    status?: "UNPAID" | "PAID"
+}) {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "ADMIN") {
+        return []
+    }
+
+    const where: Record<string, unknown> = {}
+    if (params?.jockeyId) {
+        where.jockeyId = params.jockeyId
+    }
+    if (params?.status) {
+        where.status = params.status
+    }
+
+    const payouts = await prisma.payout.findMany({
+        where,
+        include: {
+            jockey: {
+                select: { id: true, name: true, email: true },
+            },
+        },
+        orderBy: { createdAt: "desc" },
+    })
+
+    return payouts
+}
+
+export async function updatePayoutStatus(payoutId: string, status: "UNPAID" | "PAID") {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" }
+    }
+
+    try {
+        const payout = await prisma.payout.update({
+            where: { id: payoutId },
+            data: { status },
+        })
+
+        return { success: true, payout }
+    } catch (error) {
+        console.error("Update payout status error:", error)
+        return { success: false, error: "Gagal mengubah status payout" }
+    }
+}
+
+export async function deletePayout(payoutId: string) {
+    const session = await getServerSession(authOptions)
+    if (!session || session.user.role !== "ADMIN") {
+        return { success: false, error: "Unauthorized" }
+    }
+
+    try {
+        await prisma.payout.delete({
+            where: { id: payoutId },
+        })
+
+        return { success: true }
+    } catch (error) {
+        console.error("Delete payout error:", error)
+        return { success: false, error: "Gagal menghapus payout" }
+    }
+}
